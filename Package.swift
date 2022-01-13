@@ -5,6 +5,11 @@ import PackageDescription
 
 let package = Package(
     name: "LabeledStepper",
+    platforms: [
+        .iOS(.v13),
+        // TODO: Should adapt colors for macOS
+        // .macOS(.v10_15)
+    ],
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
@@ -21,8 +26,5 @@ let package = Package(
         .target(
             name: "LabeledStepper",
             dependencies: []),
-        .testTarget(
-            name: "LabeledStepperTests",
-            dependencies: ["LabeledStepper"]),
-    ]
+        ]
 )

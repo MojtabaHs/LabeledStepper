@@ -1,15 +1,33 @@
 import SwiftUI
 
-struct LabeledStepper: View {
+public struct LabeledStepper: View {
 
-    @EnvironmentObject private var style: Style
-    @Binding var value: Int
+    public init(
+        _ title: String,
+        description: String = "",
+        value: Binding<Int>,
+        in range: ClosedRange<Int> = 0...Int.max,
+        longPressInterval: Double = 0.3,
+        repeatOnLongPress: Bool = true,
+        style: Style = .init()
+    ) {
+        self.title = title
+        self.description = description
+        self._value = value
+        self.range = range
+        self.longPressInterval = longPressInterval
+        self.repeatOnLongPress = repeatOnLongPress
+    }
 
-    var title: String = ""
-    var description: String = ""
-    var range = 0...Int.max
-    var longPressInterval = 0.3
-    var repeatOnLongPress = true
+    @Binding public var value: Int
+
+    public var title: String = ""
+    public var description: String = ""
+    public var range = 0...Int.max
+    public var longPressInterval = 0.3
+    public var repeatOnLongPress = true
+
+    public var style = Style()
 
     @State private var timer: Timer?
     private var isPlusButtonDisabled: Bool { value >= range.upperBound }
@@ -22,7 +40,6 @@ struct LabeledStepper: View {
 
         func action(_ timer: Timer?) {
             operation(&value, 1)
-            style.haptic.controls()
         }
 
         /// Instant action call for short press action
@@ -37,13 +54,14 @@ struct LabeledStepper: View {
         )
     }
 
-    var body: some View {
+    public var body: some View {
 
         HStack {
             Text(title)
+                .foregroundColor(style.titleColor)
 
             Text(description)
-                .foregroundColor(style.color.hint)
+                .foregroundColor(style.descriptionColor)
 
             Spacer()
 
@@ -53,16 +71,21 @@ struct LabeledStepper: View {
                 .onLongPressGesture(
                     minimumDuration: 0
                 ) {} onPressingChanged: { onPress($0, operation: -=) }
-                .frame(width: style.size.smallButtonHeight, height: style.size.smallButtonHeight)
+                .frame(width: style.buttonWidth, height: style.height)
                 .disabled(isMinusButtonDisabled)
-                .foregroundColor(isMinusButtonDisabled ? style.color.stepperInactiveForeground : style.color.stepperActiveForeground)
+                .foregroundColor(
+                    isMinusButtonDisabled
+                    ? style.inactiveButtonColor
+                    : style.activeButtonColor
+                )
                 .contentShape(Rectangle())
 
                 Divider()
                     .padding([.top, .bottom], 8)
 
                 Text("\(value)")
-                    .frame(width: style.size.smallButtonHeight, height: style.size.smallButtonHeight)
+                    .foregroundColor(style.valueColor)
+                    .frame(width: style.labelWidth, height: style.height)
 
                 Divider()
                     .padding([.top, .bottom], 8)
@@ -72,14 +95,18 @@ struct LabeledStepper: View {
                 .onLongPressGesture(
                     minimumDuration: 0
                 ) {} onPressingChanged: { onPress($0, operation: +=) }
-                .frame(width: style.size.smallButtonHeight, height: style.size.smallButtonHeight)
+                .frame(width: style.buttonWidth, height: style.height)
                 .disabled(isPlusButtonDisabled)
-                .foregroundColor(isPlusButtonDisabled ? style.color.stepperInactiveForeground : style.color.stepperActiveForeground)
+                .foregroundColor(
+                    isPlusButtonDisabled
+                    ? style.inactiveButtonColor
+                    : style.activeButtonColor
+                    )
                 .contentShape(Rectangle())
             }
-            .background(style.color.stepperBackground)
-            .clipShape(RoundedRectangle(cornerRadius: style.size.cornerRadius, style: style.shape.roundedCornerStyle))
-            .frame(height: style.size.smallButtonHeight)
+            .background(style.backgroundColor)
+            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .frame(height: style.height)
         }
         .lineLimit(1)
     }
@@ -91,8 +118,12 @@ struct LabeledStepper: View {
 struct LabeledStepper_Previews: PreviewProvider {
 
     static var previews: some View {
-        LabeledStepper(value: .constant(5))
+        LabeledStepper(
+            "Title",
+            description: "description",
+            value: .constant(5)
+        )
             .previewLayout(.sizeThatFits)
-            .environmentObject(Style.system)
+            .padding()
     }
 }
