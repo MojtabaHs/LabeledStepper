@@ -116,14 +116,21 @@ public struct LabeledStepper: View {
 // MARK: - Preview
 
 struct LabeledStepper_Previews: PreviewProvider {
+    struct Demo: View {
+        @State private var value: Int = 0
+
+        var body: some View {
+            LabeledStepper(
+                "Title",
+                description: "description",
+                value: $value,
+                in: 0...10
+            )
+        }
+    }
 
     static var previews: some View {
-        LabeledStepper(
-            "Title",
-            description: "description",
-            value: .constant(5)
-        )
-            .previewLayout(.sizeThatFits)
+        Demo()
             .padding()
     }
 }
