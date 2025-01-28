@@ -17,6 +17,7 @@ public struct LabeledStepper: View {
         self.range = range
         self.longPressInterval = longPressInterval
         self.repeatOnLongPress = repeatOnLongPress
+        self.style = style
     }
 
     @Binding public var value: Int
